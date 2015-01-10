@@ -15,6 +15,7 @@ func TestDocumentExists(t *testing.T) {
 	
 	doc1 := &Document{"doc1", "", db}
 	
-	exists, _ := doc1.Exists()
+	exists, couchResp := doc1.Exists()
 	fmt.Println("Doc1 exists:", exists)
+	fmt.Println("Doc1 content:", doc1, couchResp.StatusCode, couchResp.Headers)
 }
