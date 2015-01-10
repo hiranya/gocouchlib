@@ -9,8 +9,6 @@ type Server struct {
 	UserInfo *url.Userinfo
 }
 
-var httpClient = &HttpClient{}
-
 func (s *Server) FullUrl() string {
 	fullUrl, _ := url.Parse(s.Url)
 	if s.UserInfo != nil {
@@ -25,11 +23,11 @@ func (s *Server) endpoint(api string) string {
 }
 
 func (s *Server) Info() JsonObj {
-	couchResp, _ := httpClient.Get(s.endpoint("/"))
+	couchResp, _ := httpClient.Get(s.endpoint("/"), nil)
 	return couchResp.Json
 }
 
 func (s *Server) AllDbs() JsonObj {
-	couchResp, _ := httpClient.Get(s.endpoint("/_all_dbs"))
+	couchResp, _ := httpClient.Get(s.endpoint("/_all_dbs"), nil)
 	return couchResp.Json
 }

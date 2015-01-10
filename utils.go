@@ -14,17 +14,21 @@ type CouchResponse struct {
 
 	// error responses
 	StatusCode int
-//	Error      string
-//	Reason     string
+	Headers	http.Header
+	//	Error      string
+	//	Reason     string
 }
 
 type JsonObj interface{}
 
 var hc = &http.Client{}
 
-type HttpClient struct{}
+type HttpClient struct {
+}
 
-func (this *HttpClient) Get(url string) (*CouchResponse, error) {
+var httpClient = &HttpClient{}
+
+func (this *HttpClient) Get(url string, headers http.Header) (*CouchResponse, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		throwError(err)
@@ -54,17 +58,24 @@ func (this *HttpClient) Get(url string) (*CouchResponse, error) {
 	return &CouchResponse{Json: jsonObj, StatusCode: resp.StatusCode}, nil
 }
 
-func (this *HttpClient) Head(url string) (*CouchResponse, error) {
+func (this *HttpClient) Head(url string, headers http.Header) (*CouchResponse, error) {
 	fmt.Println("=> URL", url)
 
-	resp, err := hc.Head(url)
+	req, err := http.NewRequest("HEAD", url, nil)
 	if err != nil {
 		throwError(err)
 	}
+	
+	req.Header = headers
 
+	resp, err := hc.Do(req)
+	if err != nil {
+		throwError(err)
+	}
+	
 	var jsonObj JsonObj
 
-	return &CouchResponse{Json: jsonObj, StatusCode: resp.StatusCode}, nil
+	return &CouchResponse{Json: jsonObj, StatusCode: resp.StatusCode, Headers: resp.Header}, nil
 }
 
 func (this *HttpClient) Delete(url string) (*CouchResponse, error) {
@@ -93,7 +104,7 @@ func (this *HttpClient) Put(url string) (*CouchResponse, error) {
 	if err != nil {
 		throwError(err)
 	}
-	
+
 	return &CouchResponse{Json: nil, StatusCode: resp.StatusCode}, nil
 }
 
