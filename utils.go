@@ -1,6 +1,7 @@
 package gocouchlib
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -8,15 +9,16 @@ import (
 	"time"
 )
 
+// CouchResponse contains the elements of the HTTP response returned by the CouchDB Server
 type CouchResponse struct {
-	// json payload
+	// Json payload returned by the CouchDB server as a response to the request
 	Json JsonObj
 
-	// error responses
+	// HTTP Status code returned by the CouchDB server
 	StatusCode int
-	Headers	http.Header
-	//	Error      string
-	//	Reason     string
+
+	// HTTP Response Headers returned by the CouchDB server
+	Headers http.Header
 }
 
 type JsonObj interface{}
@@ -41,21 +43,7 @@ func (this *HttpClient) Get(url string, headers http.Header) (*CouchResponse, er
 	}
 	defer resp.Body.Close()
 
-	var jsonObj JsonObj
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		throwError(err)
-	}
-
-	//fmt.Println("=> [Log]: HTTP response dump:", string(body))
-
-	err = json.Unmarshal(body, &jsonObj)
-	if err != nil {
-		throwError(err)
-	}
-
-	return &CouchResponse{Json: jsonObj, StatusCode: resp.StatusCode}, nil
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode}, nil
 }
 
 func (this *HttpClient) Head(url string, headers http.Header) (*CouchResponse, error) {
@@ -65,17 +53,17 @@ func (this *HttpClient) Head(url string, headers http.Header) (*CouchResponse, e
 	if err != nil {
 		throwError(err)
 	}
-	
-	req.Header = headers
+
+	if headers != nil {
+		req.Header = headers
+	}
 
 	resp, err := hc.Do(req)
 	if err != nil {
 		throwError(err)
 	}
-	
-	var jsonObj JsonObj
 
-	return &CouchResponse{Json: jsonObj, StatusCode: resp.StatusCode, Headers: resp.Header}, nil
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode, Headers: resp.Header}, nil
 }
 
 func (this *HttpClient) Delete(url string) (*CouchResponse, error) {
@@ -90,11 +78,54 @@ func (this *HttpClient) Delete(url string) (*CouchResponse, error) {
 		throwError(err)
 	}
 
-	return &CouchResponse{Json: nil, StatusCode: resp.StatusCode}, nil
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode}, nil
 }
 
-func (this *HttpClient) Put(url string) (*CouchResponse, error) {
-	req, err := http.NewRequest("PUT", url, nil)
+func (this *HttpClient) Put(url string, jsonObj JsonObj, headers http.Header) (*CouchResponse, error) {
+	var req *http.Request
+	var err error
+
+	if jsonObj != nil {
+
+		jsonBytes, err := json.Marshal(&jsonObj)
+		if err != nil {
+			throwError(err)
+		}
+
+		req, err = http.NewRequest("PUT", url, bytes.NewBuffer(jsonBytes))
+		if err != nil {
+			throwError(err)
+		}
+	} else {
+		req, err = http.NewRequest("PUT", url, nil)
+		if err != nil {
+			throwError(err)
+		}
+	}
+
+	if headers != nil {
+		req.Header = headers
+	}
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := hc.Do(req)
+	if err != nil {
+		throwError(err)
+	}
+
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode}, nil
+}
+
+func (this *HttpClient) Post(url string, jsonObj JsonObj) (*CouchResponse, error) {
+	fmt.Println("=> utils.Save() entry: ")
+
+	jsonBytes, err := json.Marshal(&jsonObj)
+	if err != nil {
+		throwError(err)
+	}
+
+	fmt.Println("=> utils.Save(): ", string(jsonBytes))
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBytes))
 	if err != nil {
 		throwError(err)
 	}
@@ -105,11 +136,28 @@ func (this *HttpClient) Put(url string) (*CouchResponse, error) {
 		throwError(err)
 	}
 
-	return &CouchResponse{Json: nil, StatusCode: resp.StatusCode}, nil
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode}, nil
 }
 
 func throwError(err error) (JsonObj, error) {
 	return nil, &CouchError{
 		time.Now(), err.Error(),
 	}
+}
+
+func getResponseJson(resp *http.Response) JsonObj {
+	var jsonRespObj JsonObj
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		throwError(err)
+	}
+
+	//fmt.Println("=> [Log]: HTTP response dump:", string(body))
+
+	err = json.Unmarshal(body, &jsonRespObj)
+	if err != nil {
+		throwError(err)
+	}
+	return jsonRespObj
 }
