@@ -3,7 +3,6 @@ package gocouchlib
 import (
 	"fmt"
 	"net/url"
-	//	"reflect"
 	"testing"
 )
 
@@ -38,5 +37,26 @@ func TestDocumentGet(t *testing.T) {
 	case JsonObj:
 	default:
 		t.Error("Document.Get() did not return a Json document")
+	}
+}
+
+func TestDocumentSave(t *testing.T) {
+	s := &Server{"http://localhost:5984",
+		url.UserPassword("testuser", "password"),
+	}
+
+	db := &Database{"gocouch", s}
+
+	type EmployeeDoc struct {
+		EmployeeId   int 
+		EmployeeName string
+		EmployeeAge  int
+	}
+
+	new_doc := &Document{Db: db, Json: EmployeeDoc{10, "Hiranya", 32}}
+	fmt.Println("=> new_doc: ", new_doc)
+	success, couchResp := new_doc.Save()
+	if !success {
+		t.Error("New document without _id and _rev did not save successfully. CouchResponse:", couchResp)
 	}
 }
