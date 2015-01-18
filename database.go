@@ -28,7 +28,7 @@ func (db *Database) Info() (JsonObj, *CouchResponse) {
 }
 
 func (db *Database) Create() (bool, *CouchResponse) {
-	couchResp, _ := httpClient.Put(db.endpoint("/"))
+	couchResp, _ := httpClient.Put(db.endpoint("/"), nil, nil)
 	return couchResp.StatusCode == http.StatusCreated, couchResp
 }
 
