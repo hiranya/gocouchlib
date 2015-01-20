@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"strings"
 )
 
 // CouchResponse contains the elements of the HTTP response returned by the CouchDB Server
@@ -43,7 +44,7 @@ func (this *HttpClient) Get(url string, headers http.Header) (*CouchResponse, er
 	}
 	defer resp.Body.Close()
 
-	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode}, nil
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode, Headers: resp.Header}, nil
 }
 
 func (this *HttpClient) Head(url string, headers http.Header) (*CouchResponse, error) {
@@ -67,6 +68,7 @@ func (this *HttpClient) Head(url string, headers http.Header) (*CouchResponse, e
 }
 
 func (this *HttpClient) Delete(url string) (*CouchResponse, error) {
+	fmt.Println("URL: ", url)
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		throwError(err)
@@ -78,7 +80,7 @@ func (this *HttpClient) Delete(url string) (*CouchResponse, error) {
 		throwError(err)
 	}
 
-	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode}, nil
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode, Headers: resp.Header}, nil
 }
 
 func (this *HttpClient) Put(url string, jsonObj JsonObj, headers http.Header) (*CouchResponse, error) {
@@ -112,7 +114,7 @@ func (this *HttpClient) Put(url string, jsonObj JsonObj, headers http.Header) (*
 		throwError(err)
 	}
 
-	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode}, nil
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode, Headers: resp.Header}, nil
 }
 
 func (this *HttpClient) Post(url string, jsonObj JsonObj) (*CouchResponse, error) {
@@ -136,7 +138,7 @@ func (this *HttpClient) Post(url string, jsonObj JsonObj) (*CouchResponse, error
 		throwError(err)
 	}
 
-	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode}, nil
+	return &CouchResponse{Json: getResponseJson(resp), StatusCode: resp.StatusCode, Headers: resp.Header}, nil
 }
 
 func throwError(err error) (JsonObj, error) {
@@ -160,4 +162,8 @@ func getResponseJson(resp *http.Response) JsonObj {
 		throwError(err)
 	}
 	return jsonRespObj
+}
+
+func TrimEtag(etag string) string {
+	return strings.Trim(etag, "\"")
 }
