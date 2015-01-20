@@ -40,7 +40,7 @@ func (doc *Document) Exists() (bool, *CouchResponse) {
 
 	// Set doc.Rev using the ETag on the response if it is currently empty
 	if (couchResp.StatusCode == http.StatusOK || couchResp.StatusCode == http.StatusNotModified) && doc.Rev == "" && couchResp.Headers.Get("ETag") != "" {
-		doc.Rev = couchResp.Headers.Get("ETag")
+		doc.Rev = TrimEtag(couchResp.Headers.Get("ETag"))
 	}
 
 	return (couchResp.StatusCode == http.StatusOK || couchResp.StatusCode == http.StatusNotModified), couchResp
@@ -59,7 +59,7 @@ func (doc *Document) Get() (JsonObj, *CouchResponse) {
 	if couchResp.StatusCode == http.StatusOK || couchResp.StatusCode == http.StatusNotModified {
 		json = couchResp.Json
 		doc.Json = couchResp.Json
-		doc.Rev = couchResp.Headers.Get("ETag")
+		doc.Rev = TrimEtag(couchResp.Headers.Get("ETag"))
 	}
 
 	return json, couchResp
@@ -73,7 +73,7 @@ func (doc *Document) Delete() (bool, *CouchResponse) {
 	couchResp, _ := httpClient.Delete(doc.docEndpoint(params))
 
 	if couchResp.StatusCode == http.StatusOK || couchResp.StatusCode == http.StatusAccepted {
-		doc.Rev = couchResp.Headers.Get("ETag")
+		doc.Rev = TrimEtag(couchResp.Headers.Get("ETag"))
 		doc.Deleted = true
 	}
 
@@ -94,8 +94,10 @@ func (doc *Document) Save() (bool, *CouchResponse) {
 	}
 
 	if couchResp.StatusCode == http.StatusCreated || couchResp.StatusCode == http.StatusAccepted {
-		doc.Rev = couchResp.Headers.Get("ETag")
+		doc.Rev = TrimEtag(couchResp.Headers.Get("ETag"))
 	}
 
 	return couchResp.StatusCode == http.StatusCreated || couchResp.StatusCode == http.StatusAccepted, couchResp
 }
+
+
