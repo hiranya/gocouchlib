@@ -7,7 +7,7 @@ import (
 )
 
 func TestDatabaseCreateDelete(t *testing.T) {
-	s := &Server{"http://localhost:5984",
+	s := &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 
@@ -27,7 +27,7 @@ func TestDatabaseCreateDelete(t *testing.T) {
 
 func TestDatabaseExists(t *testing.T) {
 	// Test case: Database.Exists()
-	s := &Server{"http://localhost:5984",
+	s := &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 

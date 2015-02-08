@@ -13,7 +13,7 @@ type EmployeeDoc struct {
 }
 
 func TestDocumentExists(t *testing.T) {
-	s := &Server{"http://localhost:5984",
+	s := &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 
@@ -27,7 +27,7 @@ func TestDocumentExists(t *testing.T) {
 }
 
 func TestDocumentGet(t *testing.T) {
-	s := &Server{"http://localhost:5984",
+	s := &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 
@@ -47,7 +47,7 @@ func TestDocumentGet(t *testing.T) {
 }
 
 func TestDocumentSave(t *testing.T) {
-	s := &Server{"http://localhost:5984",
+	s := &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 
@@ -95,7 +95,7 @@ func TestDocumentSave(t *testing.T) {
 }
 
 func TestDocumentDelete(t *testing.T) {
-	s := &Server{"http://localhost:5984",
+	s := &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 

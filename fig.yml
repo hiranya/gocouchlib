@@ -1,0 +1,14 @@
+couchdb1:
+  image: klaemo/couchdb
+  ports:
+  - "5984:5984"
+  volumes:
+  - docker/couchdb/:/usr/local/var/lib/couchdb
+  - docker/couchdb-local.ini:/usr/local/etc/couchdb/local.ini
+gocouchlib:
+  build: .
+  command: go test
+  volumes:
+  - .:/gocouchlib
+  links:
+  - couchdb1:couchdb1

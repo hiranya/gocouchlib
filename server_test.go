@@ -10,7 +10,7 @@ import (
 func TestServer(t *testing.T) {
 
 	// Test case: CouchDB URL without authentication credentials
-	s := &Server{"http://localhost:5984", nil}
+	s := &Server{"http://couchdb1:5984", nil}
 
 	fmt.Println(s.FullUrl())
 
@@ -19,7 +19,7 @@ func TestServer(t *testing.T) {
 	}
 
 	// Test case: CouchDB URL with authentication credentials
-	s = &Server{"http://localhost:5984",
+	s = &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 	fmt.Println(s.FullUrl())
@@ -29,7 +29,7 @@ func TestServer(t *testing.T) {
 	}
 
 	// Test case: Server.Info()
-	s = &Server{"http://localhost:5984",
+	s = &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 

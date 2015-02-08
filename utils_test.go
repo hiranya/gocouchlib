@@ -7,7 +7,7 @@ import (
 )
 
 func TestPut(t *testing.T) {
-	var server = &Server{"http://localhost:5984",
+	var server = &Server{"http://couchdb1:5984",
 		url.UserPassword("testuser", "password"),
 	}
 	db := Database{"gocouch", server}
