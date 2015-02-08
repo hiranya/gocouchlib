@@ -38,8 +38,13 @@ func main() {
 ```
 
 ## Development
-Want to contribute? Great! Please use gitflow workflow to submit your features or patches <http://nvie.com/posts/a-successful-git-branching-model/>
+Code contributions are welcome. Please use gitflow workflow to submit your features or patches <http://nvie.com/posts/a-successful-git-branching-model/>
 
+## Testing
+The test suite for gocouchlib can be executed using Docker and Fig (http://www.fig.sh/). Just type;
+```bash
+sudo fig up
+```
 
 ## License
 Copyright (C) 2015  Hiranya Samarasekera <hiranyas@gmail.com>
