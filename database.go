@@ -38,3 +38,10 @@ func (db *Database) Delete() (bool, *CouchResponse) {
 	couchResp, _ := httpClient.Delete(db.endpoint("/"))
 	return couchResp.StatusCode == http.StatusOK, couchResp
 }
+
+// Compact database
+// POST /{db}/_compact
+func (db *Database) Compact() (bool, *CouchResponse) {
+	couchResp, _ := httpClient.Post(db.endpoint("/_compact"), nil)
+	return couchResp.StatusCode == http.StatusAccepted, couchResp
+}

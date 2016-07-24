@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 	"strings"
+	"time"
 )
 
 // CouchResponse contains the elements of the HTTP response returned by the CouchDB Server
@@ -118,16 +118,23 @@ func (this *HttpClient) Put(url string, jsonObj JsonObj, headers http.Header) (*
 }
 
 func (this *HttpClient) Post(url string, jsonObj JsonObj) (*CouchResponse, error) {
-	fmt.Println("=> utils.Save() entry: ")
+	// fmt.Println("=> utils.Save() entry: ")
+	var reqBody *bytes.Buffer
+
+	if jsonObj == nil {
+		_ = json.Unmarshal([]byte(`{}`), &jsonObj)
+	}
 
 	jsonBytes, err := json.Marshal(&jsonObj)
 	if err != nil {
 		throwError(err)
 	}
 
-	fmt.Println("=> utils.Save(): ", string(jsonBytes))
+	// fmt.Println("=> utils.Save(): ", string(jsonBytes))
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBytes))
+	reqBody = bytes.NewBuffer(jsonBytes)
+
+	req, err := http.NewRequest("POST", url, reqBody)
 	if err != nil {
 		throwError(err)
 	}
